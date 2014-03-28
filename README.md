@@ -10,6 +10,8 @@ Installation
 Licence
 ----------
 
+BSD Licence as follows:
+
   Copyright (c) 2014, Mobile Minds LTD.
   All rights reserved.
 
