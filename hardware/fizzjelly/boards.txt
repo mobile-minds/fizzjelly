@@ -1,0 +1,22 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
+##############################################################
+
+fizzjelly.name=Mobile-Minds FizzJelly
+fizzjelly.upload.protocol=avr109
+fizzjelly.upload.maximum_size=28672
+fizzjelly.upload.speed=57600
+fizzjelly.upload.disable_flushing=true
+fizzjelly.bootloader.low_fuses=0xff
+fizzjelly.bootloader.high_fuses=0xd8
+fizzjelly.bootloader.extended_fuses=0xcb
+fizzjelly.bootloader.path=caterina
+fizzjelly.bootloader.file=Caterina-Leonardo.hex
+fizzjelly.bootloader.unlock_bits=0x3F
+fizzjelly.bootloader.lock_bits=0x2F
+fizzjelly.build.mcu=atmega32u4
+fizzjelly.build.f_cpu=16000000L
+fizzjelly.build.vid=0x2341
+fizzjelly.build.pid=0x8036
+fizzjelly.build.core=fizzjelly
+fizzjelly.build.variant=fizzjelly
