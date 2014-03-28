@@ -7,6 +7,13 @@ Installation
 1. Firstly download the Arduino IDE from http://arduino.cc/download
 2. Download the FizzJelly library files (click on Download Zip on the right hand side) and extract them to the root of your Arduino IDE directory. For windows this is typically *"C:\Program Files\Arduino"* or *"C:\Program Files (x86)\Arduino"* and all other operating systems, it is location of where you extracted the Arduino IDE files.
 
+How to Use
+----------
+After copying the library files into your Arduino (and restarting the Arduino IDE if neccessary), FizzJelly will appear in Arduino Menu Tools->Board->Mobile-Minds FizzJelly.
+
+To get started, please see the tutorials at http://wiki.fizzjelly.com and for any help or guidance our forums at http://forums.fizzjelly.com
+
+
 Licence
 ----------
 
