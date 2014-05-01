@@ -58,7 +58,7 @@
 
 // Number of maximum High/Low changes per packet.
 // We can handle up to (unsigned long) => 32 bit * 2 H/L changes per bit + 2 for sync
-#define RCSWITCH_MAX_CHANGES 67
+#define RCSWITCH_MAX_CHANGES 106
 
 #define PROTOCOL3_SYNC_FACTOR   71
 #define PROTOCOL3_0_HIGH_CYCLES  4
@@ -94,7 +94,7 @@ class MM_433Sensors {
     void resetAvailable();
     void pinChangeReceive();
 	
-    unsigned long getReceivedValue();
+    unsigned long long getReceivedValue();
     unsigned int getReceivedBitlength();
     unsigned int getReceivedDelay();
     unsigned int getReceivedProtocol();
@@ -124,7 +124,7 @@ class MM_433Sensors {
     void send1();
     void sendSync();
     void transmit(int nHighPulses, int nLowPulses);
-
+    static uint8_t crc8( uint8_t *addr, uint8_t len);
     static char* dec2binWzerofill(unsigned long dec, unsigned int length);
     static char* dec2binWcharfill(unsigned long dec, unsigned int length, char fill);
     
@@ -133,6 +133,7 @@ class MM_433Sensors {
     static bool receiveProtocol1(unsigned int changeCount);
     static bool receiveProtocol2(unsigned int changeCount);
     static bool receiveProtocol3(unsigned int changeCount);
+    static bool receiveWH3Sensor(unsigned int changeCount);
     int nReceiverInterrupt;
     #endif
     int nTransmitterPin;
@@ -142,7 +143,7 @@ class MM_433Sensors {
 
     #if not defined( RCSwitchDisableReceiving )
     static int nReceiveTolerance;
-    static unsigned long nReceivedValue;
+    static unsigned long long nReceivedValue;
     static unsigned int nReceivedBitlength;
     static unsigned int nReceivedDelay;
     static unsigned int nReceivedProtocol;

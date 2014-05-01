@@ -38,7 +38,7 @@
 #include "MM_PinInterrupts.h"
 
 #if not defined( RCSwitchDisableReceiving )
-unsigned long MM_433Sensors::nReceivedValue = NULL;
+unsigned long long MM_433Sensors::nReceivedValue = 0ull;;
 unsigned int MM_433Sensors::nReceivedBitlength = 0;
 unsigned int MM_433Sensors::nReceivedDelay = 0;
 unsigned int MM_433Sensors::nReceivedProtocol = 0;
@@ -54,7 +54,7 @@ MM_433Sensors::MM_433Sensors() {
   #if not defined( RCSwitchDisableReceiving )
   this->nReceiverInterrupt = -1;
   this->setReceiveTolerance(60);
-  MM_433Sensors::nReceivedValue = NULL;
+  MM_433Sensors::nReceivedValue = 0ull;;
   #endif
 }
 
@@ -645,7 +645,7 @@ void MM_433Sensors::resetAvailable() {
   MM_433Sensors::nReceivedValue = NULL;
 }
 
-unsigned long MM_433Sensors::getReceivedValue() {
+unsigned long long MM_433Sensors::getReceivedValue() {
     return MM_433Sensors::nReceivedValue;
 }
 
@@ -787,6 +787,64 @@ void MM_433Sensors::pinChangeReceive()
   MM_433Sensors::handleInterrupt();
 }
 
+
+void MM_433Sensors::handleInterrupt()
+{
+	static unsigned int duration;
+	static unsigned int changeCount;
+	static unsigned long lastTime;
+	static unsigned int repeatCount;
+
+	long time = micros();
+	duration = time - lastTime;
+
+	if (duration > 5000 && MM_433Sensors::timings[0]>5000) 
+	{
+		repeatCount++;
+  
+		if ((repeatCount == 1)) 
+		{
+			if(changeCount>20)
+			{
+				if (changeCount == 96)
+				{
+           if (receiveWH3Sensor(changeCount) == false)
+					 {
+							// failed
+           }
+           
+				}
+				else 
+				{
+					changeCount--;
+					if (receiveProtocol1(changeCount) == false)
+					{
+						
+					}		
+				}
+			}
+			repeatCount = 0;
+		}
+		changeCount = 0;
+	} 
+	else if (duration > 5000) 
+	{
+		changeCount = 0;
+		repeatCount=0;
+	}
+
+	if (changeCount >= RCSWITCH_MAX_CHANGES) 
+	{
+		changeCount = 0;
+		repeatCount = 0;
+	}
+	MM_433Sensors::timings[changeCount++] = duration;
+	lastTime = time;  
+}
+
+
+
+/*
 void MM_433Sensors::handleInterrupt() {
 
   static unsigned int duration;
@@ -823,6 +881,8 @@ void MM_433Sensors::handleInterrupt() {
   MM_433Sensors::timings[changeCount++] = duration;
   lastTime = time;  
 }
+*/
+
 
 /**
   * Turns a decimal value to its binary representation
@@ -851,6 +911,108 @@ char* MM_433Sensors::dec2binWcharfill(unsigned long Dec, unsigned int bitLength,
   
   return bin;
 }
+
+
+
+/*
+*
+*
+*/
+bool MM_433Sensors::receiveWH3Sensor(unsigned int changeCount)
+{
+	unsigned long long code = 0ull;
+	byte packet[5];
+  packet[0] = packet[1] = packet[2] = packet[3] = packet[4] = 0;
+	unsigned int HighWidth = 1500;
+	unsigned int LowWidth = 500;
+	unsigned int delayTolerance = 200;
+
+	for (int i = 1; i<changeCount ; i=i+2) 
+	{
+		if (MM_433Sensors::timings[i] > HighWidth-delayTolerance && MM_433Sensors::timings[i] < HighWidth+delayTolerance) 
+		{
+			code = code << 1;
+		}
+		else if ( MM_433Sensors::timings[i] > LowWidth-delayTolerance && MM_433Sensors::timings[i] < LowWidth+delayTolerance) 
+		{
+			code+=1;
+			code = code << 1;
+		}
+		else
+		{
+			// Failed
+			i = changeCount;
+			code = 0;
+	  }
+	}
+
+	code = code >> 1;
+	if (changeCount == 96) 
+	{
+		if(code>0)
+		{
+			MM_433Sensors::nReceivedBitlength = changeCount / 2;
+			MM_433Sensors::nReceivedDelay = 500;
+      MM_433Sensors::nReceivedProtocol = 4;
+      packet[4] = (byte)((code) & (0xff)); 
+      packet[3] = (byte)((code >> 8) & (0xff));
+      packet[2] = (byte)((code >> 16) & (0xff));
+      packet[1] = (byte)((code >> 24) & (0xff));
+      packet[0] = (byte)((code >> 32) & (0xff));
+      
+      MM_433Sensors::nReceivedValue = 0ull;
+      
+      MM_433Sensors::nReceivedValue = ( ((unsigned long)packet[0] << 24) 
+                   + ((unsigned long)packet[1] << 16) 
+                   + ((unsigned long)packet[2] << 8) 
+                   + ((unsigned long)packet[3] ) );
+       
+      byte calculated_crc = 0 ;
+      
+      calculated_crc = crc8(packet, 4);    
+         
+      if (calculated_crc == packet[4])
+      {
+        
+        return true;
+      }
+      else
+      {
+        return false;       
+      }     
+  
+		}
+	}
+
+	if (code == 0)
+		return false;
+	else
+		return true;
+
+}
+
+
+
+/*
+*
+*
+*/
+uint8_t MM_433Sensors::crc8( uint8_t *addr, uint8_t len)
+{
+  uint8_t crc = 0;
+
+  while (len--) {
+    uint8_t inbyte = *addr++;
+    for (uint8_t i = 8; i; i--) {
+      uint8_t mix = (crc ^ inbyte) & 0x80; 
+      crc <<= 1; 
+      if (mix) crc ^= 0x31;
+      inbyte <<= 1; 
+    }
+  }
+  return crc;
+}
+
 
 #endif
 

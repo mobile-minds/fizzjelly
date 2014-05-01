@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <stdint.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <Time.h>
+
 
 
 #define GSM_IO_POWERKEY               20
@@ -42,6 +42,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 #define GSM_NETWORK_REGISTER_TIMEOUT  20000
 
+
+
+typedef struct 
+{
+  char NetworkDate[9];
+  uint8_t NetworkDateLen;
+  char NetworkTime[9];
+  uint8_t NetworkTimeLen;
+} GSM_NETWORK_TIME ;
+
+
 class GSM
 {
   public:
@@ -52,7 +63,7 @@ class GSM
     int8_t SetSIMPIN(char * PINCode);
     int8_t GetSIMStatus();
     int8_t GetNetworkStatus();
-    
+    int8_t GetNetworkDateTime(GSM_NETWORK_TIME * dateTime );
   /*protected:*/
 };
 

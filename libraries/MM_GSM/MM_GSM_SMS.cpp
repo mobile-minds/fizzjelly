@@ -18,11 +18,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "Arduino.h"
 #include "MM_GSM_SMS.h"
 #include "MM_GSM_Serial.h"
+#include "../Time/Time.h" 
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stddef.h>
-#include "../Time/Time.h"
 
 // DEBUG_SMS_NOSEND - When defined, SMS's will be sent to the Serial debug 
 //                     console, rather than being sent to save SMS credits.

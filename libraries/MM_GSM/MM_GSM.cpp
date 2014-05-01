@@ -24,7 +24,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <stdint.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <Time.h>
+#include "../Time/Time.h"
 
 /*********************************************************************************/
 // GSM
@@ -262,3 +262,61 @@ int8_t GSM::GetNetworkStatus()
   
   return -1;
 }
+
+
+
+
+int8_t GSM::GetNetworkDateTime(GSM_NETWORK_TIME * dateTime )
+{
+  
+  char response[64];
+  int responseLen=0;
+  int i = 0 ;
+  
+  
+    for (i=0; i<sizeof(dateTime->NetworkDate); i++)
+        dateTime->NetworkDate[i] = 0;
+    
+    dateTime->NetworkDateLen = 0;
+    
+    for (i=0; i<sizeof(dateTime->NetworkTime); i++)
+        dateTime->NetworkTime[i] = 0;
+        
+    dateTime->NetworkTimeLen = 0;
+  
+  //enable the clock  
+  if ( (responseLen=GSMSerial.SendCommand("AT+CLTS=1\r","OK",response,sizeof(response))) < 1)
+    return -1;
+   
+  //get the date and time
+  if ((responseLen=GSMSerial.SendCommand("AT+CCLK? \r","OK",response,sizeof(response))) > 1)
+  {
+    response[responseLen]='\0';
+    
+    char *DateStr = strchr(response, '\"')+1;
+    char *TimeStr = strchr(response, ',')+1;
+    
+    if (DateStr != NULL)
+    {
+     memcpy(dateTime->NetworkDate, DateStr, 8);
+     dateTime->NetworkDateLen = strlen(dateTime->NetworkDate);
+     dateTime->NetworkDate[dateTime->NetworkDateLen] = '\0';
+    } 
+    
+    
+    if (TimeStr != NULL)
+    {
+     memcpy(dateTime->NetworkTime, TimeStr, 8);
+     dateTime->NetworkTimeLen = strlen(dateTime->NetworkTime);
+     dateTime->NetworkTime[dateTime->NetworkTimeLen] = '\0';
+    }  
+    
+    return 0;
+  
+  }
+  else
+  {
+    return -1;
+  } 
+  
+}  

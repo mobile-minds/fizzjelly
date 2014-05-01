@@ -24,8 +24,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include <stdint.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <Time.h>
-
 
 #define GSM_SMS_TIMEOUT_MESSAGESEND                        20000
 #define GSM_SMS_TIMEOUT_MESSAGEREAD                        2500
